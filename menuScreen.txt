@@ -1,0 +1,21 @@
+
+
+		Welcome to...
+		  ______      _____  _  ___      ______ _ 
+		 |  ____/\   |  __ \| |/ / |    |  ____| |
+		 | |__ /  \  | |__) | ' /| |    | |__  | |
+		 |  __/ /\ \ |  _  /|  < | |    |  __| | |
+		 | | / ____ \| | \ \| . \| |____| |____|_|
+		 |_|/_/    \_\_|  \_\_|\_\______|______(_)
+               Get to 5000 points before the other player to win!      
+
+To play:
+The dice will be rolled and displayed.
+Any valid melds (combinations) will be displayed with points
+Choose which melds you would like to keep (multiple may be chosen)
+You may choose to roll again with any remaining dice, or bank your score.
+If you roll and no valid melds are present, your score for the turn is a 0
+
+Good luck!
+                     
+                                          
