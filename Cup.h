@@ -14,7 +14,7 @@ public:
 	void setScore(int n) { rollScore = n; }
 	int tallyScore(); // Finds and returns the score of the hand
 	void checkCup();//just checks if all dice have been used and if they have, resets them
-	void resetCup();//called between turns to set it back to essentially a starting state of no kept dice 
+	void resetCup(int);//called between turns to set it back to essentially a starting state of no kept dice 
 	friend ostream& operator<<(ostream&, Cup&);
 	void printDice(Cup&, int); // Could also have a 'table' where the die are scattered before they are ordered below
 	void rollCup();

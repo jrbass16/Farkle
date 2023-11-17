@@ -8,7 +8,7 @@ void Player::playTurn(Player& opponent) {
 	int rollScore = 0;
 	int turnScore = 0;
 	int again;
-	myCup.resetCup();//reset it. this is called in case this isn't the first turn
+	myCup.resetCup(6);//reset it. this is called in case this isn't the first turn
 	do {
 		again = 0;//set to not repeat
 		system("cls");
