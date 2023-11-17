@@ -1,13 +1,18 @@
-#include "Start.h"
+#include "start.h"
 
+//Function: 	startGame
+//
+//inputs: 		none
+//outputs: 		none
+//
+//Description:	Changes color of terminal, displays menu and waits for input
 void startGame() {
-	system("color 70");//changes the color. The system command is the new thing in C that we haven't done in class
-	//it puts into the system command line whatever the string inputted to it is
-	ifstream inFile;
-	string newline;
-	inFile.open("menuScreen.txt"); //open file with the screen in it
+	system("color 70");
+	std::ifstream inFile;
+	std::string newline;
+	inFile.open("menuScreen.txt");
 	while (getline(inFile, newline)) {
-		cout << newline << endl;
+		std::cout << newline << std::endl;
 	}
 	inFile.close();
 	system("pause");

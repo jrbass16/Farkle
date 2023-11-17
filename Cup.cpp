@@ -1,58 +1,85 @@
-#include "Cup.h"
+#include "cup.h"
 #include "melds.h"
-ostream& operator<<(ostream& os, Cup& cup) {
+#include <algorithm>
+#include <iostream>
+#include <vector>
+
+
+//this should really be an overload in the dice to display the dice
+std::ostream& operator<<(std::ostream& os, Cup& cup) {
 	os << "|" << cup.dice[cup.i].getSide() << "| ";
 	return os;
 }
-
+//Function: 	printDice
+//
+//inputs: 		cup, integer for some odd reason
+//outputs: 		none
+//
+//Description:	Displays the dice in the current roll both in a format as though they were scattered
+//				across a table and then neatly organized for the player
 void Cup::printDice(Cup& cup, int i = 0) {
-	cout << endl << endl;
+	std::cout << std::endl << std::endl;
 	//Print Table
-	cout << "  _____________________________________________________";
-	cout << endl << endl;
+	std::cout << "  _____________________________________________________";
+	std::cout << std::endl << std::endl;
 	cup.i = 0;
+	//clean this up. Make r a bucket of 6 randoms generated once, then just use each index
 	for (int a = 0; a < 6; a++) {
-		cout << "  |";
+		std::cout << "  |";
 		int r = rand() % 24;
 		for (int b = 0; b < 24; b++) {
-			cout << " ";
+			std::cout << " ";
 			if (b == r) {
 				if (cup.dice[cup.i].isKept() == false) {
-					cout << cup;
+					std::cout << cup;
 				}
 				else {
-					cout << "    ";
+					std::cout << "    ";
 				}
 				cup.i++;
 
 			}
-			cout << " ";
+			std::cout << " ";
 		}
-		//cout << "                                                ";	
-		cout << "|";
-		cout << endl;
+		//std::cout << "                                                ";	
+		std::cout << "|";
+		std::cout << std::endl;
 	}
-	cout << "  _____________________________________________________";
-	cout << endl;
+	std::cout << "  _____________________________________________________";
+	std::cout << std::endl << std::endl << std::endl;;
 	//Print ordered
-	cout << endl << endl;
 	cup.i = 0;
-	cout << "Here are the dice in play organized: ";
+	std::cout << "Here are the dice in play organized: ";
 	while (cup.i < 6) {
 		if (cup.dice[cup.i].isKept() == false) {
-			cout << cup;
+			std::cout << cup;
 		}
 		cup.i++;
 	}
-	cout << endl << endl;
+	std::cout << std::endl << std::endl;
 }
-
-void Cup::resetCup(int diceToReset) {
-	for (int i = 0; i < diceToReset; i++) {//for each dice
-		dice[i].setKept(false);//set kept to false; they are in play
+//Function: 	resetCup
+//
+//inputs: 		int diceForNextRoll
+//outputs: 		none
+//
+//Description:	un-keeps the number of dice needed for the next roll
+void Cup::setDiceToPlay(int diceForNextRoll) {
+	std::cout << diceForNextRoll <<" dice in play" <<std::endl;//debug statement
+	for (int i = 0; i < 6; i++) {//for each dice up to the number being called
+	std::cout<<i;
+	//sets the status of each dice according to whether its index is above or below how many dice are needed
+	dice[i].setKept(!(i<diceForNextRoll));
+	std::cout << "Dice "<< i<< " is " << (dice[i].isKept()?"Kept":"NotKept") << std::endl;
 	}
 }
 
+//Function: 	checkCup
+//
+//inputs: 		none
+//outputs: 		none
+//
+//Description:	Checks whether all 6 dice in the cup are kept. If they are, resets all of them
 void Cup::checkCup() {
 	int count = 0;
 	bool reset = false;
@@ -63,10 +90,18 @@ void Cup::checkCup() {
 	}//once all are counted
 	if (count == 6) {//if all 6 dice are kept
 		//reset them to put them back into play
-		resetCup(6);
+		setDiceToPlay(6);
 	}
 }
 
+//Function: 	tallyScore
+//
+//inputs: 		none
+//outputs: 		int pointReturn
+//
+//Description:	looks through the dice in play (not kept) and checks for any present melds
+//				then prompts the user on whether they would like to select one or more of these melds.
+//				resets the number of dice kept for all melds, then returns the point total
 int Cup::tallyScore() {
 	Meld run("Full run!","run", 2500, 6);
 	Meld _3pairs("Three pairs!","3pairs", 1500, 6);
@@ -79,31 +114,37 @@ int Cup::tallyScore() {
 	Meld _3three("Triple 3!","3three",300, 3);
 	Meld _3two("Triple 2!","3two", 200, 3);
 	Meld _3one("Triple 1!","3one",1000, 3);
-	Meld _5s("5s!","5s", 50, 1);
-	Meld _1s("1s!","1s", 100, 1);
+	Meld _5s("5s!","5s", 50, 0);
+	Meld _1s("1s!","1s", 100, 0);
+	Meld curMeld("Inactive", "NULL", 0, 0);
 
-	int again = 0;
-	int values[] = { 0, 0, 0, 0, 0, 0 };
-	string userIn;
+	std::vector<int> values { 0, 0, 0, 0, 0, 0 };
+
+	std::string userIn;
+
 	bool bust = true;
-	//check combinations from the top down.
-	//I think the easiest way is to know how many of each value there is and check from there, then identify which dice are valid
-	for (int i = 0; i < 6; i++) { //for each of the 6 dice
-		if (dice[i].isKept() == false) { //checks if they were just rolled
+	int foundMeld;
+	int again = 0;
+	int pointReturn = 0;
+	int numDiceToReset = 0;
+	
+	//Checking all dice for potential combinations
+
+	//Sets the value vector so that each index reflects the number of dice with that value
+	for (int i = 0; i < 6; i++) { 
+		if (dice[i].isKept() == false) { 
 			values[dice[i].getSide()-1]++;
 		}
 	}
-	cout << endl;
-	//for each case, it looks at the dice that were just rolled and sees if their values match a meld. 
-	//It then marks down that meld as valid in the points array and moves on to the next meld to check
-	for (int i = 0; i < 6; i++) {
-		cout<<values[i];
-	}
-	cout << endl;
+	std::cout << std::endl;
+	std::cout << std::endl;
+
+	//Potentially move the display function in melds into setPresent so if setPresent is called true, it also displays the values
+
 	//Full run
-	if (values[0] == 1 && values[1] == 1 && values[2] == 1 && values[3] == 1 && values[4] == 1 && values[5] == 1) {
-	run.display();run.setPresent(1);}
-	//Three pairs
+	if (values == (std::vector<int>)(1,1,1,1,1,1)) {run.display();run.setPresent(true);}
+	
+	//Three pairs requires the most logic
 	int pairs = 0;
 	for (int i = 0; i < 6; i++) {
 		if (values[i] == 2) {
@@ -113,17 +154,15 @@ int Cup::tallyScore() {
 			pairs += 2;
 		}
 	}
+
 	if (pairs == 3) {
 	_3pairs.display();_3pairs.setPresent(1);}
 	//Six of a kind
-	if (values[0] == 6 || values[1] == 6 || values[2] == 6 || values[3] == 6 || values[4] == 6 || values[5] == 6) {
-	_6oK.display();_6oK.setPresent(1);}
+	if (*max_element(values.begin(), values.end()) == 6) {_6oK.display();_6oK.setPresent(true);}
 	//Five of a kind
-	if (values[0] >= 5 || values[1] == 5 || values[2] == 5 || values[3] == 5 || values[4] == 5 || values[5] == 5) {
-	_5oK.display();_5oK.setPresent(1);}
+	if (*max_element(values.begin(), values.end()) == 5) {_5oK.display();_5oK.setPresent(true);}
 	//Four of a kind
-	if (values[0] >= 4 || values[1] == 4 || values[2] == 4 || values[3] == 4 || values[4] == 4 || values[5] == 4) {
-	_4oK.display();_4oK.setPresent(1);}
+	if (*max_element(values.begin(), values.end()) == 4) {_4oK.display();_4oK.setPresent(true);}
 	//Triple 6
 	if (values[5] >= 3) {_3six.display();_3six.setPresent(1);}
 	//Triple 5
@@ -131,25 +170,17 @@ int Cup::tallyScore() {
 	//Triple 4
 	if (values[3] >= 3) {_3four.display();_3four.setPresent(1);}
 	//Triple 3
-	if (values[2] >= 3) {
-	_3three.display();_3three.setPresent(true);}
+	if (values[2] >= 3) {_3three.display();_3three.setPresent(true);}
 	//Triple 2
-	if (values[1] >= 3) {
-	_3two.display();_3two.setPresent(true);}
+	if (values[1] >= 3) {_3two.display();_3two.setPresent(true);}
 	//Triple 1
-	if (values[0] >= 3) {
-	_3one.display();_3one.setPresent(true);}
+	if (values[0] >= 3) {_3one.display();_3one.setPresent(true);}
 	//Fives
-	if (values[4] >= 1) {
-	_5s.display();_5s.setPresent(true);}
+	if (values[4] >= 1) {_5s.display();_5s.setPresent(true);}
 	//Ones
-	if (values[0] >= 1) {
-	_1s.display();_1s.setPresent(true);}
-	cout << endl;
-	int foundMeld;
-	Meld curMeld("Inactive", "NULL", 0, 0);
-	int pointReturn = 0;
-
+	if (values[0] >= 1) {_1s.display();_1s.setPresent(true);}
+	std::cout << std::endl;
+	
 	std::map<std::string, Meld> allMelds = {
     	{"run", run},
     	{"3pairs", _3pairs},
@@ -165,13 +196,12 @@ int Cup::tallyScore() {
     	{"5s", _5s},
     	{"1s", _1s}
 	};
-
+	//maybe move the above checking for melds into a checkForMelds function and return the map or a reference to the map
 	do {
 		int temp = 1;
-		int resetDice = 0;
 		again = 0;
 		std::cout << "Which meld do you want to keep?" << std::endl;
-		cin >> userIn;
+		std::cin >> userIn;
 		for (auto iter = allMelds.begin(); iter != allMelds.end(); iter++) {
 			if ((iter->second.getShorthand() == userIn)&&iter->second.isPresent() == true){
 				curMeld = iter->second;
@@ -179,33 +209,20 @@ int Cup::tallyScore() {
 				bust = false;
 			}
 		}
-		resetDice = curMeld.getActiveDice();
-		if (userIn == "5s") {//5's, ask how many to keep and add p for each
+		numDiceToReset += curMeld.getActiveDice();
+		if (userIn == _5s.getShorthand() || userIn == _1s.getShorthand()) {//if they selected ones or fives
 			int j = 0;
 			int k = 0;
-			cout << "How many 5's would you like to keep?: ";
-			cin >> temp;
-			while (!cin || temp > values[4] || temp < 0) {//input is not an integer or is out of bounds
-				cin.clear();
-				cin.ignore(128, '\n');
-				cout << "Input ERROR. Please try again:";
-				cin >> temp;
+			std::cout << "How many " << userIn[0] << "'s would you like to keep?: ";
+			std::cin >> temp;
+			while (!std::cin || temp > values[(int)(userIn[0]-'1')] || temp < 0) {//input is tring to keep more than exist
+				std::cin.clear();
+				std::cin.ignore(128, '\n');
+				std::cout << "Input ERROR. Please try again:";
+				std::cin >> temp;
 			}
 			bust = false;
-		}
-		else if (userIn == "1s"){//1's, ask how many to keep and add 100 for each
-			int j = 0;
-			int k = 0;
-			cout << "How many 1's would you like to keep?: ";
-			cin >> temp;
-			while (!cin || temp > values[0] || temp < 0) {//input is not an integer or is out of bounds
-				cin.clear();
-				cin.ignore(128, '\n');
-				cout << "Input ERROR. Please try again:";
-				cin >> temp;
-			}
-			bust = false;
-			resetCup(temp);
+			numDiceToReset+=temp;
 		}
 		int anotherMeld = 0;
 		for (auto iter = allMelds.begin(); iter != allMelds.end(); ++iter) {
@@ -214,27 +231,48 @@ int Cup::tallyScore() {
 			}
 		}
 		if (anotherMeld == 1) {//there are still valid melds left
-			cout << "Choose another meld? (1. Yes) (0. No)\t";
-			cin >> again;
-			while (!cin || again < 0 || again > 1) {//input is not an integer or is out of bounds
-				cin.clear();
-				cin.ignore(128, '\n');
-				cout << "Input ERROR. Please try again:";
-				cin >> again;
+			std::cout << "Choose another meld? (1. Yes) (0. No)\t";
+			std::cin >> again;
+			while (!std::cin || again < 0 || again > 1) {//input is not an integer or is out of bounds
+				std::cin.clear();
+				std::cin.ignore(128, '\n');
+				std::cout << "Input ERROR. Please try again:";
+				std::cin >> again;
 			}
 		}
 		pointReturn += curMeld.getValue()*temp;
-		resetCup(temp);
 	} while (again == 1);
+	std::cout << "Dice for next roll: " << diceInPlay()-numDiceToReset << std::endl;//debug statement
+	setDiceToPlay(diceInPlay()-numDiceToReset);
 	if (bust == true) { pointReturn = -1; }
 	return pointReturn;//returns the score for this roll
 }
 
-
+//Function: 	rollCup
+//
+//inputs: 		none
+//outputs: 		none
+//
+//Description:	Rolls every dice that has not been kept 
 void Cup::rollCup() { //random number now assigned for every dice in the array	
 	for (int i = 0; i < 6; i++) {
 		if (dice[i].isKept() == false) {//if the dice hasn't been kept
 			dice[i].rollDice();//call the rolldice function
 		}
 	}
+}
+//Function: 	diceInPlay
+//
+//inputs: 		none
+//outputs: 		numDice
+//
+//Description:	Counts how many dice are in play 
+int Cup::diceInPlay() { //random number now assigned for every dice in the array
+	int numDice	= 0;
+	for (int i = 0; i < 6; i++) {
+		if (dice[i].isKept() == false) {//if the dice hasn't been kept
+			numDice++;//increment the number of dice in play
+			}
+	}
+	return numDice;
 }

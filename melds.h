@@ -2,10 +2,8 @@
 #include <string>
 #include <map>
 #include <vector>
-#include "Dice.h"
+#include "dice.h"
 
-#ifndef MELD_H
-#define MELD_H
 class Meld{
     private:
 	std::string displayText;
@@ -15,7 +13,7 @@ class Meld{
     int diceVals[6];
     int activeDice; //number of dice needed to complete the meld
     public:
-    void setVals(int vals [6]){for (int i = 0;i<6;i++){diceVals[i] = vals[i];}}
+    //void setVals(int vals [6]){for (int i = 0;i<6;i++){diceVals[i] = vals[i];}}
     std::string getShorthand(){return shorthand;}
     int getActiveDice(){return activeDice;}
     int getValue() {return value;}
@@ -27,4 +25,3 @@ class Meld{
     {displayText = Disp,shorthand = shorty; value = score; presentInRoll = 0; activeDice = actDice;}
     ~Meld() {}
 };
-#endif

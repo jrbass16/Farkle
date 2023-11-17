@@ -1,7 +1,7 @@
-#include "Dice.h"
-#include "Cup.h"
-#include "Player.h"
-#include "Start.h"
+#include "dice.h"
+#include "cup.h"
+#include "player.h"
+#include "start.h"
 using namespace std;
 
 int main() {
