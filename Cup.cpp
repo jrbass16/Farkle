@@ -10,6 +10,7 @@ std::ostream& operator<<(std::ostream& os, Cup& cup) {
 	os << "|" << cup.dice[cup.i].getSide() << "| ";
 	return os;
 }
+
 //Function: 	printDice
 //
 //inputs: 		cup, integer for some odd reason
@@ -58,6 +59,7 @@ void Cup::printDice(Cup& cup, int i = 0) {
 	}
 	std::cout << std::endl << std::endl;
 }
+
 //Function: 	resetCup
 //
 //inputs: 		int diceForNextRoll
@@ -65,12 +67,12 @@ void Cup::printDice(Cup& cup, int i = 0) {
 //
 //Description:	un-keeps the number of dice needed for the next roll
 void Cup::setDiceToPlay(int diceForNextRoll) {
-	std::cout << diceForNextRoll <<" dice in play" <<std::endl;//debug statement
+	//std::cout << diceForNextRoll <<" dice in play" <<std::endl;//debug statement
 	for (int i = 0; i < 6; i++) {//for each dice up to the number being called
-	std::cout<<i;
+	//std::cout<<i;
 	//sets the status of each dice according to whether its index is above or below how many dice are needed
 	dice[i].setKept(!(i<diceForNextRoll));
-	std::cout << "Dice "<< i<< " is " << (dice[i].isKept()?"Kept":"NotKept") << std::endl;
+	//std::cout << "Dice "<< i<< " is " << (dice[i].isKept()?"Kept":"NotKept") << std::endl;
 	}
 }
 
@@ -242,7 +244,7 @@ int Cup::tallyScore() {
 		}
 		pointReturn += curMeld.getValue()*temp;
 	} while (again == 1);
-	std::cout << "Dice for next roll: " << diceInPlay()-numDiceToReset << std::endl;//debug statement
+	//std::cout << "Dice for next roll: " << diceInPlay()-numDiceToReset << std::endl;//debug statement
 	setDiceToPlay(diceInPlay()-numDiceToReset);
 	if (bust == true) { pointReturn = -1; }
 	return pointReturn;//returns the score for this roll
@@ -261,6 +263,7 @@ void Cup::rollCup() { //random number now assigned for every dice in the array
 		}
 	}
 }
+
 //Function: 	diceInPlay
 //
 //inputs: 		none
